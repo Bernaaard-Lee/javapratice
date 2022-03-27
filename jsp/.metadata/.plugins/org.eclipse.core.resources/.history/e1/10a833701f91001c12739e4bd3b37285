@@ -1,0 +1,131 @@
+package sec03.brd02;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.Servlet;
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.FileUploadException;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
+
+
+// @WebServlet("/board/*")
+public class BoardController extends HttpServlet {
+	private static String ARTICLE_IMAGE_REPO = "C:/board/article_image";			// 글에 첨부한 이미지 저장 경로
+	BoardService boardService;
+	ArticleVO articleVO;
+
+	public void init(ServletConfig config) throws ServletException {
+		boardService = new BoardService();
+		articleVO = new ArticleVO();
+	}
+
+
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		doHandle(request, response);
+	}
+
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)	throws ServletException, IOException {
+		doHandle(request, response);
+	}
+
+	private void doHandle(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		String nextPage = "";												// nextPage 값 초기화
+		request.setCharacterEncoding("utf-8");
+		response.setContentType("text/html; charset=utf-8");
+		String action = request.getPathInfo();								// 요청 action에 저장
+		System.out.println("action:" + action);								// console에 action 표시
+		try {
+			List<ArticleVO> articlesList = new ArrayList<ArticleVO>();
+			if (action == null) {											// action이 없으면
+				articlesList = boardService.listArticles();					// 글 목록 표시
+				request.setAttribute("articlesList", articlesList);
+				nextPage = "/board02/listArticles.jsp";						// board02의 listArticles.jsp로 전송
+				
+			} else if (action.equals("/listArticles.do")) {					// listArticles.do를 요청하면
+				articlesList = boardService.listArticles();					// 글 목록 표시
+				request.setAttribute("articlesList", articlesList);
+				nextPage = "/board02/listArticles.jsp";						// board02의 listArticles.jsp로 전송
+				
+			} else if (action.equals("/articleForm.do")) {					// 글쓰기를 요청하면
+				nextPage = "/board02/articleForm.jsp";						// 글쓰기 폼으로 이동
+				
+			} else if (action.equals("/addArticle.do")) {					// form에서 글쓰기 버튼을 누르면
+				Map<String, String> articleMap = upload(request, response);	// articlemap에 저장
+				String title = articleMap.get("title");
+				String content = articleMap.get("content");
+				String imageFileName = articleMap.get("imageFileName");
+
+				articleVO.setParentNO(0);									// 작성되는 글번호 제일 앞으로
+				articleVO.setId("hong");									// 작성자는 hong
+				articleVO.setTitle(title);									// 제목
+				articleVO.setContent(content);								// 내용
+				articleVO.setImageFileName(imageFileName);					// 이미지이름
+				boardService.addArticle(articleVO);
+				nextPage = "/board/listArticles.do";						// 글쓰기 완료 후 글목록으로 이동
+			}
+
+			RequestDispatcher dispatch = request.getRequestDispatcher(nextPage);	// nextpage로 전송
+			dispatch.forward(request, response);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	private Map<String, String> upload(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		Map<String, String> articleMap = new HashMap<String, String>();
+		String encoding = "utf-8";											// 글 업로드 양식
+		File currentDirPath = new File(ARTICLE_IMAGE_REPO);					// 이미지 저장 폴더에 파일 생성
+		DiskFileItemFactory factory = new DiskFileItemFactory();			// 디스크에 있는 파일 불러오기
+		factory.setRepository(currentDirPath);								// 폴더 선택
+		factory.setSizeThreshold(1024 * 1024);								// 해상도? 제한?
+		ServletFileUpload upload = new ServletFileUpload(factory);
+		try {
+			List items = upload.parseRequest(request);						// 더 봐야함.. *************
+			for (int i = 0; i < items.size(); i++) {
+				FileItem fileItem = (FileItem) items.get(i);
+				if (fileItem.isFormField()) {
+					System.out.println(fileItem.getFieldName() + "=" + fileItem.getString(encoding));
+					articleMap.put(fileItem.getFieldName(), fileItem.getString(encoding));
+				} else {
+					System.out.println("파라미터 이름:" + fileItem.getFieldName());
+					System.out.println("파일명:" + fileItem.getName());
+					System.out.println("파일크기:" + fileItem.getSize() + "bytes");
+					//articleMap.put(fileItem.getFieldName(), fileItem.getName());
+					if (fileItem.getSize() > 0) {
+						int idx = fileItem.getName().lastIndexOf("\\");
+						if (idx == -1) {
+							idx = fileItem.getName().lastIndexOf("/");
+						}
+
+						String fileName = fileItem.getName().substring(idx + 1);
+						System.out.println("파일명:" + fileName);
+						articleMap.put(fileItem.getFieldName(), fileName);  
+						File uploadFile = new File(currentDirPath + "\\" + fileName);
+						fileItem.write(uploadFile);
+
+					} // end if
+				} // end if
+			} // end for
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return articleMap;
+	}
+
+}

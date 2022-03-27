@@ -1,0 +1,3 @@
+INDEX VERSION 1.131+/Users/lee/Desktop/java_data/.metadata/.plugins/org.eclipse.jdt.core
+2912218328.index
+3265646787.index

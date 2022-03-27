@@ -1,0 +1,89 @@
+package sec02.ex02;
+
+import java.io.IOException;
+import java.util.List;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+
+@WebServlet("/member/*")
+public class MemberController extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+	MemberDAO memberDAO;
+
+	public void init() throws ServletException {
+		memberDAO = new MemberDAO();
+	}
+
+
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		doHandle(request, response);
+	}
+
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)	throws ServletException, IOException {
+		doHandle(request, response);
+	}
+
+	private void doHandle(HttpServletRequest request, HttpServletResponse response)	throws ServletException, IOException {
+		String nextPage = null;												// nextPage 초기화
+		request.setCharacterEncoding("utf-8");
+		response.setContentType("text/html;charset=utf-8");
+		String action = request.getPathInfo();								// 요청 받아 action에 저장
+		System.out.println("action:" + action);								// 콘솔에 action 출력
+		
+		if (action == null || action.equals("/listMembers.do")) {
+			List<MemberVO> membersList = memberDAO.listMembers();
+			request.setAttribute("membersList", membersList);
+			nextPage = "/test03/listMembers.jsp";							// listMembers.jsp로 포워딩
+			
+		} else if (action.equals("/addMember.do")) {						
+			String id = request.getParameter("id");
+			String pwd = request.getParameter("pwd");
+			String name = request.getParameter("name");
+			String email = request.getParameter("email");
+			MemberVO memberVO = new MemberVO(id, pwd, name, email);
+			memberDAO.addMember(memberVO);
+			request.setAttribute("msg", "addMember");
+			nextPage = "/member/listMembers.do";
+			
+		} else if (action.equals("/memberForm.do")) {
+			nextPage = "/test03/memberForm.jsp";
+			
+		}else if(action.equals("/modMemberForm.do")){						// 수정 요청 시
+		     String id=request.getParameter("id");							// 아이디 조회
+		     MemberVO memInfo = memberDAO.findMember(id);					// 아이디에 해당하는 정보 조회
+		     request.setAttribute("memInfo", memInfo);						// 내용을 memInfo(멤버찾기)로 바인딩
+		     nextPage="/test03/modMemberForm.jsp";							// modMemberForm(정보수정창)으로 전송
+		     
+		}else if(action.equals("/modMember.do")){							// 수정된 정보를 memberVO에 새로 저장 후 출력
+		     String id=request.getParameter("id");
+		     String pwd=request.getParameter("pwd");
+		     String name= request.getParameter("name");
+	         String email= request.getParameter("email");
+		     MemberVO memberVO = new MemberVO(id, pwd, name, email);
+		     memberDAO.modMember(memberVO);
+		     request.setAttribute("msg", "modified");						// 수정 메시지
+		     nextPage="/member/listMembers.do";								
+		     
+		}else if(action.equals("/delMember.do")){							// 삭제 요청 시
+		     String id=request.getParameter("id");							// 아이디 조회
+		     memberDAO.delMember(id);										// 삭제
+		     request.setAttribute("msg", "deleted");						//	삭제 메시지
+		     nextPage="/member/listMembers.do";
+		     
+		}else {
+			List<MemberVO> membersList = memberDAO.listMembers();
+			request.setAttribute("membersList", membersList);
+			nextPage = "/test03/listMembers.jsp";
+		}
+		RequestDispatcher dispatch = request.getRequestDispatcher(nextPage);
+		dispatch.forward(request, response);
+	}
+
+}

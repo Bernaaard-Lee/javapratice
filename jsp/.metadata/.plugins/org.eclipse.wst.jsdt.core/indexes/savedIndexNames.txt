@@ -1,0 +1,10 @@
+INDEX VERSION 1.4+/Users/lee/Desktop/java_data/jsp/.metadata/.plugins/org.eclipse.wst.jsdt.core/indexes
+417979489.index
+528750712.index
+3462343199.index
+1119334456.index
+1753426158.index
+697570392.index
+2178977243.index
+2257406402.index
+4142382413.index
