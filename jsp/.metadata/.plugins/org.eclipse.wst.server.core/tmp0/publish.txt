@@ -1,3 +1,4 @@
 #Tomcat publish data
-#Sat Feb 19 14:22:44 KST 2022
-org.eclipse.jst.jee.server\:pro17=/Library/Server/apache-tomcat-9.0.58/wtpwebapps/pro17
+#Wed Mar 30 00:03:03 KST 2022
+org.eclipse.jst.jee.server\:/binary\:/Users/lee/.m2/repository/org/springframework/spring-web/4.3.2.RELEASE/spring-web-4.3.2.RELEASE.jar=/Library/Server/apache-tomcat-9.0.58/wtpwebapps/bookshop/WEB-INF/lib/spring-web-4.3.2.RELEASE.jar
+org.eclipse.jst.jee.server\:bookshop=/Library/Server/apache-tomcat-9.0.58/wtpwebapps/bookshop
