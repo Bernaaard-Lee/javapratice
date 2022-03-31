@@ -26,5 +26,13 @@
     <!--
     <Manager pathname="" />
     -->
-<Resource auth="Container" driverClassName="oracle.jdbc.OracleDriver" maxActive="20" maxIdle="10" name="jdbc/oracle" password="Omphalos970127" type="javax.sql.DataSource" url="jdbc:oracle:thin:@oracle_high?TNS_ADMIN=/Library/DataBase/Wallet_oracle" username="admin"/> 
+<Resource auth="Container"
+ driverClassName="oracle.jdbc.OracleDriver" 
+ maxActive="20" 
+ maxIdle="10" 
+ name="jdbc/oracle" 
+ password="Omphalos970127" 
+ type="javax.sql.DataSource" 
+ url="jdbc:oracle:thin:@oracle_high?TNS_ADMIN=/Library/DataBase/Wallet_oracle" 
+ username="admin"/> 
 </Context>
