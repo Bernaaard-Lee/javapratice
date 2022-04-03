@@ -6,6 +6,7 @@
 		<item key="SmartImportRootWizardPage.STORE_NESTED_PROJECTS" value="true"/>
 		<item key="SmartImportRootWizardPage.STORE_CONFIGURE_NATURES" value="true"/>
 		<list key="org.eclipse.ui.internal.wizards.datatransfer.SmartImportRootWizardPage.knownSources">
+			<item value="/Users/lee/Desktop/java_data/jsp/bookShop01"/>
 			<item value="/Users/lee/Desktop/java_data/jsp/pro17g"/>
 			<item value="/Users/lee/Desktop/006895-master/pro19"/>
 			<item value="/Users/lee/Desktop/java_data/jsp/pro17"/>
